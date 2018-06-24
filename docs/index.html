@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Reactive programming in Spring</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+			
+				<section data-background-image="images/image-reactive.jpg">
+					<h4>Introduction to</h4>
+					<h1>Reactive programming</h1>
+					<h4>in Spring framework</h4>
+				</section>
+				
+				<section>
+					<h2>The problematics</h2>
+					<p>Common model : latency can cause dramatical issues</p>
+					<figure>
+						<img data-src="images/blocking.png" style="width: 500px;" />
+						<figcaption style="font-style: italic; font-size: large;">S. Deleuze & B. Clozel - https://speakerdeck.com/sdeleuze/reactive-spring</figcaption>
+					</figure>
+				</section>
+				
+				<section>
+					<h2>Reactive applications</h2>
+					<p>Reduce latency effects to improve stability and scalability</p>
+					<figure>
+						<img data-src="images/non_blocking.png" style="width: 600px;" />
+						<figcaption style="font-style: italic; font-size: large;">S. Deleuze & B. Clozel - https://speakerdeck.com/sdeleuze/reactive-spring</figcaption>
+					</figure>
+				</section>
+				
+				<section>
+					<h2>Reactive programming</h2>
+					<p>Work with data <strong>streams</strong> in a asynchronous and non-blocking way.</p>
+					<p>A stream is a sequence of 0 to n items, which eventually completes or fails.</p>
+					<p>A reactive library/framework gives tools to create and manipulate streams in a functional style.</p>
+				</section>
+				
+				<section>
+					<h2>Reactive in Java</h2>
+					<div class="container" style="display: flex;">
+  						<div class="fixed" style="width: 45%;">
+							<p>Reactive streams specification</p>
+  							<figure>
+								<img data-src="images/reactive-streams.png" />
+								<figcaption style="font-style: italic; font-size: large;">http://www.reactive-streams.org/reactive-streams-1.0.2-javadoc/org/reactivestreams/package-summary.html</figcaption>
+							</figure>
+  						</div>
+  						<div class="flex-item" style="flex-grow: 1;">
+  							<p>Implementations</p>
+  							<img data-src="images/rxjava.png" style="width: 250px;" />
+							<img data-src="images/akka-streams.jpg" style="width: 250px;" />
+							<img data-src="images/reactor.png" style="width: 250px;" />
+  						</div>
+					</div>
+				</section>
+				
+				<section>
+					<h2>Let's play with Reactor</h2>
+					<p>Flux and Mono implement <em>Publisher</em> interface</p>
+					<ul>
+						<li>Mono : 0 to 1 item</li>
+						<li>Flux : 0 to n items</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Reactive Spring</h2>
+					<ul>
+						<li>Reactive support based on <strong>Reactor</strong> library</li>
+						<li>Web support :
+						<ul>
+							<li>module : Spring <strong>WebFlux</strong></li>
+							<li>server : <strong>Netty</strong> (default), Undertow, Servlet 3.1+ containers (non blocking IO)</li>
+							<li>client : <strong>WebClient</strong> is reactive alternative of RestTemplate</li>
+						</ul>
+						</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Spring Web-MVC vs WebFlux</h2>
+					<img data-src="images/webflux-overview.png" />
+				</section>
+				
+				
+				<section>
+					<h2>Init Spring WebFlux project</h2>
+					<p>(Can use Spring Initializr through <a href="https://start.spring.io" target="_blank">https://start.spring.io</a> or directly in IDE)</p>
+					<ul><li>Create your first functional router :</li></ul>
+					<pre><code class="hljs" data-trim>
+@Component
+public class FunctionalStyleRouter {
+    @Bean
+    public RouterFunction&lt;ServerResponse&gt; route() {
+        return RouterFunctions
+                .route(RequestPredicates.GET("/index"), 
+                       request -> ServerResponse.ok().build());
+    }
+}
+					</code></pre>
+				</section>
+				
+				<section>
+					<h2>Router and handler for REST API</h2>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+PersonHandler handler = new PersonHandler(repository);
+
+RouterFunction&lt;ServerResponse&gt; route =
+    route(GET("/person/{id}").and(accept(APPLICATION_JSON)), handler::getPerson)
+        .andRoute(GET("/person").and(accept(APPLICATION_JSON)), handler::listPeople)
+        .andRoute(POST("/person"), handler::createPerson);
+        			</code></pre>
+				</section>
+				
+				<section>
+					<h2>Blocking DB API vs Reactive</h2>
+					<p>We have to use a non blocking API for our application to be reactive</p>
+					<figure>
+						<img data-src="images/blocking_vs_reactive.png" />
+						<figcaption style="font-style: italic; font-size: large;">S. Deleuze & B. Clozel - https://speakerdeck.com/sdeleuze/reactive-spring</figcaption>
+					</figure>
+				</section>
+				
+				<section>
+					<h2>Init model and handler</h2>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+public class PropertyPrice {
+    private String city;
+    private Integer pricePerSquare;
+    // getters/setters...
+}
+					</code></pre>
+					<p>Create handler with fake data...</p>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+@Component
+public class PropertyPriceHandler {
+    public Mono&lt;ServerResponse&gt; getAll(ServerRequest request) {
+        Flux&lt;PropertyPrice&gt; propertyPrices = 
+                Flux.just(
+                        new PropertyPrice("Paris", 9000),
+                        new PropertyPrice("London", 13000),
+                        new PropertyPrice("Rio", 11000));
+        return ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(propertyPrices, PropertyPrice.class);
+    }
+					</code></pre>
+				</section>
+				
+				<section>
+					<h2>Let's go with mongoDB</h2>
+					<p>Start mongo on docker</p>
+					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre>
+				</section>
+				
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
