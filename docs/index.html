@@ -76,12 +76,17 @@
 				</section>
 				
 				<section>
-					<h2>Let's play with Reactor</h2>
-					<p>Flux and Mono implement <em>Publisher</em> interface</p>
-					<ul>
+					<h2>Reactor basics</h2>
+					<p><strong>Flux</strong> and <strong>Mono</strong> implement <em>Publisher</em> interface</p>
+					<ul style="width: 100%;">
 						<li>Mono : 0 to 1 item</li>
 						<li>Flux : 0 to n items</li>
 					</ul>
+					<img data-src="images/flux.png" />
+				</section>
+				
+				<section>
+					<h2>Let's play with Reactor</h2>
 				</section>
 				
 				<section>
@@ -108,7 +113,7 @@
 					<h2>Init Spring WebFlux project</h2>
 					<p>(Can use Spring Initializr through <a href="https://start.spring.io" target="_blank">https://start.spring.io</a> or directly in IDE)</p>
 					<ul><li>Create your first functional router :</li></ul>
-					<pre><code class="hljs" data-trim>
+					<pre><code class="hljs" data-trim >
 @Component
 public class FunctionalStyleRouter {
     @Bean
@@ -119,12 +124,14 @@ public class FunctionalStyleRouter {
     }
 }
 					</code></pre>
+					<ul><li>Test : </li></ul><pre><code class="hljs">curl http://localhost:8080/index</code></pre>
 				</section>
 				
 				<section>
-					<h2>Router and handler for REST API</h2>
+					<h2>Router/Handler for REST API</h2>
+					<p>The <strong>HandlerFunction</strong> takes an incoming <strong>ServerRequest</strong>, returns a <strong>Mono&lt;ServerResponse&gt;</strong></p>
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
-PersonHandler handler = new PersonHandler(repository);
+PersonHandler handler = [...]
 
 RouterFunction&lt;ServerResponse&gt; route =
     route(GET("/person/{id}").and(accept(APPLICATION_JSON)), handler::getPerson)
@@ -134,24 +141,17 @@ RouterFunction&lt;ServerResponse&gt; route =
 				</section>
 				
 				<section>
-					<h2>Blocking DB API vs Reactive</h2>
-					<p>We have to use a non blocking API for our application to be reactive</p>
-					<figure>
-						<img data-src="images/blocking_vs_reactive.png" />
-						<figcaption style="font-style: italic; font-size: large;">S. Deleuze & B. Clozel - https://speakerdeck.com/sdeleuze/reactive-spring</figcaption>
-					</figure>
-				</section>
-				
-				<section>
-					<h2>Init model and handler</h2>
+					<h2>go - Init model and handler</h2>
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
 public class PropertyPrice {
+    @Id
+    private ObjectId id;
     private String city;
     private Integer pricePerSquare;
     // getters/setters...
 }
 					</code></pre>
-					<p>Create handler with fake data...</p>
+					<p>Create handler with fake data and add an endpoint with it...</p>
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
 @Component
 public class PropertyPriceHandler {
@@ -169,9 +169,36 @@ public class PropertyPriceHandler {
 				</section>
 				
 				<section>
+					<h2>Blocking DB API vs Reactive</h2>
+					<p>We have to use a non blocking API for our application to be reactive</p>
+					<figure>
+						<img data-src="images/blocking_vs_reactive.png" />
+						<figcaption style="font-style: italic; font-size: large;">S. Deleuze & B. Clozel - https://speakerdeck.com/sdeleuze/reactive-spring</figcaption>
+					</figure>
+				</section>
+				
+				<section>
 					<h2>Let's go with mongoDB</h2>
-					<p>Start mongo on docker</p>
+					<ul><li>Start mongo on docker</li></ul>
 					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre>
+					<ul><li>Add reactive mongo support with artifact</li></ul>
+					<pre><code class="hljs">org.springframework.boot:spring-boot-starter-data-mongodb-reactive</code></pre>
+					<ul><li>Create reactive mongo repository</li></ul>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+public interface [Model]Repository extends ReactiveMongoRepository&lt;[Model], ObjectId&gt; {
+}
+					</code></pre>
+					<ul><li>Use the repository in the handler</li></ul>
+				</section>
+				
+				<section>
+					<h2>Infinite streams</h2>
+					<p>Create a new endpoint which delivers infinite stream :</p>
+					<ul>
+						<li>Method <em>Flux.interval</em> to create infinite flux</li>
+						<li>Use media type <em>application/stream+json</em></li>
+						<li>Try it!</li>
+					</ul>
 				</section>
 				
 			</div>
