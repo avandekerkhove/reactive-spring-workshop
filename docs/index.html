@@ -278,12 +278,37 @@ public class DBFiller implements CommandLineRunner {
 				<section>
 					<h2>Webclient & Server-sent events</h2>
 					<p>Create a new web <em>client</em> application. We will use <strong>Webclient</strong> to call our streaming service and render server-sent events.</p>
-					<ul>
-						<li>Expose a new endpoint ; WebClient will call the streaming service we coded before</li>
-						<li>Use media type <em>text/event-stream</em></li>
-						<li>Try it!</li>
-					</ul>
-					<p>This allows to refresh information in browser without making any new request.</p>
+					<p>To do this we use media type <strong>text/event-stream</strong> :</p>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+@Controller
+public class HousePricesController {
+	
+	@GetMapping(value="/ssehouseprices", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
+	@ResponseBody
+	public Flux&lt;HousePrice&gt; streamData() {
+		return WebClient
+				.create("http://localhost:8080")	
+				.get()
+				.uri("/streamhouseprices")
+				.retrieve()
+				.bodyToFlux(HousePrice.class);
+	}
+}
+					</code></pre>
+				</section>
+				
+				<section>
+					<h2>SSE in browser</h2>
+					<p>The server-sent events allow to refresh information in browser without making any new request.</p>
+					<pre><code class="hljs" data-trim>
+&lt;script type="text/javascript"&gt;
+	var evtSource = new EventSource("/ssehouseprices");
+	evtSource.onmessage = function(e) {
+		housePrice = JSON.parse(e.data);
+		// now we can use housePrice.pricePerSquare for example..
+	}
+&lt;/script&gt;
+					</code></pre>
 				</section>
 				
 			</div>
