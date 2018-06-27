@@ -148,39 +148,62 @@ public class FunctionalStyleRouter {
 					<h2>Router/Handler for REST API</h2>
 					<p>The <strong>HandlerFunction</strong> takes an incoming <strong>ServerRequest</strong>, returns a <strong>Mono&lt;ServerResponse&gt;</strong></p>
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
-PersonHandler handler = [...]
+UserHandler handler = [...]
 
 RouterFunction&lt;ServerResponse&gt; route =
-    route(GET("/person/{id}").and(accept(APPLICATION_JSON)), handler::getPerson)
-        .andRoute(GET("/person").and(accept(APPLICATION_JSON)), handler::listPeople)
-        .andRoute(POST("/person"), handler::createPerson);
+    route(GET("/users/{id}").and(accept(APPLICATION_JSON)), handler::getUser)
+        .andRoute(GET("/users").and(accept(APPLICATION_JSON)), handler::listUsers)
+        .andRoute(POST("/users"), handler::createUser);
         			</code></pre>
 				</section>
 				
 				<section>
 					<h2>go - Init model and handler</h2>
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
-public class PropertyPrice {
-    @Id
-    private ObjectId id;
+public class HousePrice {
     private String city;
     private Integer pricePerSquare;
     // getters/setters...
 					</code></pre>
-					<p style="margin-bottom: 0">Create handler with fake data and add an endpoint with it...</p>
+					<p style="margin-bottom: 0">Create handler with fake data...</p>
 					<pre style="margin-top: 0"><code class="hljs" data-trim style="font-size: 18px;">
 @Component
-public class PropertyPriceHandler {
+public class HousePriceHandler {
     public Mono&lt;ServerResponse&gt; getAll(ServerRequest request) {
-        Flux&lt;PropertyPrice&gt; propertyPrices = 
+        Flux&lt;HousePrice&gt; housePrices = 
                 Flux.just(
-                        new PropertyPrice("Paris", 9000),
-                        new PropertyPrice("London", 13000),
-                        new PropertyPrice("Rio", 11000));
+                        new HousePrice("Paris", 9000),
+                        new HousePrice("London", 13000),
+                        new HousePrice("Rio", 11000));
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(propertyPrices, PropertyPrice.class);
+                .body(housePrices, HousePrice.class);
     }
+					</code></pre>
+				</section>
+				
+				<section>
+					<p>Create a router to expose your data...</p>
+					<pre style="margin-top: 0"><code class="hljs" data-trim style="font-size: 18px;">
+@Bean
+public RouterFunction&lt;ServerResponse&gt; route() {
+    return RouterFunctions
+            .route(GET("/houseprices"), handler::getAll);
+}
+					</code></pre>
+					<p>... and test it!</p>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">curl http://localhost:8080/houseprices | jq
+[
+  {
+    "city": "Paris",
+    "pricePerSquare": 9000
+  },
+  {
+    "city": "London",
+    "pricePerSquare": 13000
+  },
+  ...
+]
 					</code></pre>
 				</section>
 				
@@ -195,16 +218,38 @@ public class PropertyPriceHandler {
 				
 				<section>
 					<h2>Let's do it with mongoDB</h2>
-					<ul><li>Start mongo on docker</li></ul>
-					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre>
-					<ul><li>Add reactive mongo support with artifact</li></ul>
-					<pre><code class="hljs">org.springframework.boot:spring-boot-starter-data-mongodb-reactive</code></pre>
-					<ul><li>Create reactive mongo repository</li></ul>
+					<ul><li>Start mongo on docker
+					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre></li>
+					<li>Add reactive mongo support with artifact
+					<pre><code class="hljs">org.springframework.boot:spring-boot-starter-data-mongodb-reactive</code></pre></li>
+					<li>Add id for mongo persistence on model...
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+@Id
+private ObjectId id;
+					</code></pre></li>
+					</ul>
+				</section>
+				
+				<section>
+					<ul>
+						<li>...Create reactive mongo repository
 					<pre><code class="hljs" data-trim style="font-size: 18px;">
 public interface [Model]Repository extends ReactiveMongoRepository&lt;[Model], ObjectId&gt; {
 }
-					</code></pre>
-					<ul><li>Use the repository in the handler</li></ul>
+					</code></pre></li>
+					<li>Use the repository in the handler instead of the mock</li>
+					<li>Add data in the repository ! Can use <em>CommandLineRunner</em> for example...
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+@Component
+public class DBFiller implements CommandLineRunner {
+@Override
+	public void run(String... args) throws Exception {
+		// do it here...
+	}
+}
+					</code></pre></li>
+					<li>Test again!</li>
+					</ul>
 				</section>
 				
 				<section>
@@ -213,7 +258,20 @@ public interface [Model]Repository extends ReactiveMongoRepository&lt;[Model], O
 					<ul>
 						<li>Method <em>Flux.interval</em> to create infinite flux</li>
 						<li>Use media type <em>application/stream+json</em></li>
+						<li>Update randomly your data in repository to see changes</li>
 						<li>Try it!</li>
+						<pre><code class="hljs" data-trim style="font-size: 18px;">curl http://localhost:8080/streamhouseprices
+{"city":"Paris","pricePerSquare":10420}
+{"city":"Rio","pricePerSquare":11920}
+{"city":"London","pricePerSquare":14170}
+{"city":"Paris","pricePerSquare":10430}
+{"city":"Rio","pricePerSquare":11930}
+{"city":"London","pricePerSquare":14180}
+{"city":"Paris","pricePerSquare":10440}
+{"city":"Rio","pricePerSquare":11940}
+{"city":"London","pricePerSquare":14190}
+......
+						</code></pre>
 					</ul>
 				</section>
 				
