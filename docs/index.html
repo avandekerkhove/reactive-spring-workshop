@@ -26,7 +26,7 @@
 			<div class="slides">
 			
 				<section data-background-image="images/image-reactive.jpg">
-					<h4>Introduction to</h4>
+					<h4 style="color: white;">Introduction to</h4>
 					<h1>Reactive programming</h1>
 					<h4>in Spring framework</h4>
 				</section>
@@ -87,11 +87,28 @@
 				
 				<section>
 					<h2>Let's play with Reactor</h2>
+					<pre><code class="hljs" data-trim style="font-size: 18px;">
+Flux
+    .just("strings", "to", "test", "reactor", ".") // create Flux with static data
+    .map(String::toUpperCase)                      // 1 to 1 transformation
+    .flatMap(s -> Flux.fromArray(s.split("")))     // 1 to n transformation, can call an async service...
+    .filter(s -> !"S".equals(s))
+    .map(s -> {
+        if (".".equals(s))
+            throw new IllegalArgumentException("I don't want ending '.' .");
+        return s;
+    })
+    .doOnError(e -> System.err.println("Error : " + e.toString()))
+    .subscribe(s -> System.out.println(s))         // nothing happens if we don't subscribe
+    ;
+				</code></pre>
+				<p>More operators and samples on the <a href="http://projectreactor.io/docs/core/release/reference/#which-operator" target="_blank">official doc</a>!</p>
 				</section>
 				
 				<section>
 					<h2>Reactive Spring</h2>
 					<ul>
+						<li>Support added in Spring 5 / Spring-Boot 2 releases</li>
 						<li>Reactive support based on <strong>Reactor</strong> library</li>
 						<li>Web support :
 						<ul>
@@ -110,7 +127,7 @@
 				
 				
 				<section>
-					<h2>Init Spring WebFlux project</h2>
+					<h2>Go - Init WebFlux project</h2>
 					<p>(Can use Spring Initializr through <a href="https://start.spring.io" target="_blank">https://start.spring.io</a> or directly in IDE)</p>
 					<ul><li>Create your first functional router :</li></ul>
 					<pre><code class="hljs" data-trim >
@@ -149,10 +166,9 @@ public class PropertyPrice {
     private String city;
     private Integer pricePerSquare;
     // getters/setters...
-}
 					</code></pre>
-					<p>Create handler with fake data and add an endpoint with it...</p>
-					<pre><code class="hljs" data-trim style="font-size: 18px;">
+					<p style="margin-bottom: 0">Create handler with fake data and add an endpoint with it...</p>
+					<pre style="margin-top: 0"><code class="hljs" data-trim style="font-size: 18px;">
 @Component
 public class PropertyPriceHandler {
     public Mono&lt;ServerResponse&gt; getAll(ServerRequest request) {
@@ -178,7 +194,7 @@ public class PropertyPriceHandler {
 				</section>
 				
 				<section>
-					<h2>Let's go with mongoDB</h2>
+					<h2>Let's do it with mongoDB</h2>
 					<ul><li>Start mongo on docker</li></ul>
 					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre>
 					<ul><li>Add reactive mongo support with artifact</li></ul>
@@ -199,6 +215,17 @@ public interface [Model]Repository extends ReactiveMongoRepository&lt;[Model], O
 						<li>Use media type <em>application/stream+json</em></li>
 						<li>Try it!</li>
 					</ul>
+				</section>
+				
+				<section>
+					<h2>Webclient & Server-sent events</h2>
+					<p>Create a new web <em>client</em> application. We will use <strong>Webclient</strong> to call our streaming service and render server-sent events.</p>
+					<ul>
+						<li>Expose a new endpoint ; WebClient will call the streaming service we coded before</li>
+						<li>Use media type <em>text/event-stream</em></li>
+						<li>Try it!</li>
+					</ul>
+					<p>This allows to refresh information in browser without making any new request.</p>
 				</section>
 				
 			</div>
