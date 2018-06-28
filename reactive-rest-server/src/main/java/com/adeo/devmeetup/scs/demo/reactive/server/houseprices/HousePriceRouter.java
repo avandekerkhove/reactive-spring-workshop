@@ -1,5 +1,7 @@
 package com.adeo.devmeetup.scs.demo.reactive.server.houseprices;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicates;
@@ -19,7 +21,8 @@ public class HousePriceRouter {
     @Bean
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
-                .route(RequestPredicates.GET("/houseprices"), handler::getAllInMongo);
+                .route(GET("/houseprices"), handler::getAllInMongo)
+                .andRoute(GET("/streamhouseprices"), handler::streamAll);
     }
     
 }

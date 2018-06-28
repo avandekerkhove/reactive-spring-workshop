@@ -20,20 +20,6 @@ public class HousePrice {
     }
 
     /**
-     * @return the id
-     */
-    public ObjectId getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    /**
      * @return the city
      */
     public String getCity() {

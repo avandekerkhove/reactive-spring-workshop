@@ -1,8 +1,12 @@
 package com.adeo.devmeetup.scs.demo.reactive.server.houseprices;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_STREAM_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+import java.time.Duration;
+
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -36,5 +40,16 @@ public class HousePriceHandler {
                 .contentType(APPLICATION_JSON)
                 .body(housePrices, HousePrice.class);
     }
+    
+    public Mono<ServerResponse> streamAll(ServerRequest request) {
+        Flux<HousePrice> infinite = 
+                Flux
+                    .interval(Duration.ZERO, Duration.ofSeconds(1))
+                    .flatMap(l -> repository.findAll());
+        return ok()
+                .contentType(APPLICATION_STREAM_JSON)
+                .body(infinite, HousePrice.class);
+    }
+    
     
 }
