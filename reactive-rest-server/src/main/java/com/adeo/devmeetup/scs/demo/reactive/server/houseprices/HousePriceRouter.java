@@ -19,7 +19,7 @@ public class HousePriceRouter {
     @Bean
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
-                .route(RequestPredicates.GET("/houseprices"), handler::getAll);
+                .route(RequestPredicates.GET("/houseprices"), handler::getAllInMongo);
     }
     
 }

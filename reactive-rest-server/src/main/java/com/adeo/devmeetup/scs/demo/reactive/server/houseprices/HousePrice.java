@@ -1,7 +1,13 @@
 package com.adeo.devmeetup.scs.demo.reactive.server.houseprices;
 
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+
 public class HousePrice {
 
+    @Id
+    private ObjectId id;
+    
     private String city;
     
     private Integer pricePerSquare;
@@ -11,6 +17,20 @@ public class HousePrice {
     public HousePrice(String city, Integer pricePerSquare) {
         this.city = city;
         this.pricePerSquare = pricePerSquare;
+    }
+
+    /**
+     * @return the id
+     */
+    public ObjectId getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     /**

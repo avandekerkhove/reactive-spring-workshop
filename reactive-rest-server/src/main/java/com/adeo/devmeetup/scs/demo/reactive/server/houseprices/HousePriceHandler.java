@@ -13,12 +13,25 @@ import reactor.core.publisher.Mono;
 @Component
 public class HousePriceHandler {
 
-    public Mono<ServerResponse> getAll(ServerRequest request) {
+    private final HousePriceRepository repository;
+    
+    public HousePriceHandler(HousePriceRepository repository) {
+        this.repository = repository;
+    }
+
+    public Mono<ServerResponse> getAllStatic(ServerRequest request) {
         Flux<HousePrice> housePrices = 
                 Flux.just(
                         new HousePrice("Paris", 9000),
                         new HousePrice("London", 13000),
                         new HousePrice("Rio", 11000));
+        return ok()
+                .contentType(APPLICATION_JSON)
+                .body(housePrices, HousePrice.class);
+    }
+    
+    public Mono<ServerResponse> getAllInMongo(ServerRequest request) {
+        Flux<HousePrice> housePrices = repository.findAll();
         return ok()
                 .contentType(APPLICATION_JSON)
                 .body(housePrices, HousePrice.class);
