@@ -17,6 +17,11 @@ public class HousePricesController {
         this.webClient = WebClient.create("http://localhost:8080");
     }
 
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+    
     @GetMapping(value="/ssehouseprices", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
     public Flux<HousePrice> streamData() {
