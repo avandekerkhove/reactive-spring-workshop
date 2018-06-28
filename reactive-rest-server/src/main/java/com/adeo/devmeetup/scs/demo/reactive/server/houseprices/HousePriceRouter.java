@@ -1,7 +1,4 @@
-package com.adeo.devmeetup.scs.demo.reactive.server.router;
-
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
+package com.adeo.devmeetup.scs.demo.reactive.server.houseprices;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -11,12 +8,18 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Component
-public class FunctionalStyleRouter {
+public class HousePriceRouter {
+
+    private final HousePriceHandler handler;
+    
+    public HousePriceRouter(HousePriceHandler handler) {
+        this.handler = handler;
+    }
 
     @Bean
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
-                .route(GET("/index"), request -> ok().build());
+                .route(RequestPredicates.GET("/houseprices"), handler::getAll);
     }
     
 }
