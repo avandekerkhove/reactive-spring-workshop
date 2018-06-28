@@ -220,6 +220,7 @@ public RouterFunction&lt;ServerResponse&gt; route() {
 					<h2>Let's do it with mongoDB</h2>
 					<ul><li>Start mongo on docker
 					<pre><code class="hljs">docker run --rm --name mongo -d -p 27017:27017 mongo</code></pre></li>
+					<li><strong>Or</strong> you can use embedded mongo with dependency <pre><code class="hljs">de.flapdoodle.embed:de.flapdoodle.embed.mongo</code></pre></li>
 					<li>Add reactive mongo support with artifact
 					<pre><code class="hljs">org.springframework.boot:spring-boot-starter-data-mongodb-reactive</code></pre></li>
 					<li>Add id for mongo persistence on model...
