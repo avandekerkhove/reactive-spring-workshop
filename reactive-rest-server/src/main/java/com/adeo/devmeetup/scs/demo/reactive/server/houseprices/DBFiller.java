@@ -32,19 +32,6 @@ public class DBFiller implements CommandLineRunner {
         repository
             .insert(housePrices)
             .blockLast();
-        
-        // crappy way of doing some random prices updates
-        while (true) {
-            repository
-                .findAll()
-                .map(hp -> {
-                    hp.setPricePerSquare(hp.getPricePerSquare()+10);
-                    repository.save(hp).subscribe();
-                    return hp;
-                })
-                .blockLast();
-            Thread.sleep(2000);
-        }
     }
 
 }
