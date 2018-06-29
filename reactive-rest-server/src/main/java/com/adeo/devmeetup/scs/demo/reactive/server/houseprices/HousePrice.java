@@ -47,6 +47,4 @@ public class HousePrice {
         this.pricePerSquare = pricePerSquare;
     }
     
-    
-    
 }

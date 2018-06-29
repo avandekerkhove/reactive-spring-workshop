@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
 
+/**
+ * Class implementing {@link CommandLineRunner} to insert data in repository on startup.
+ */
 @Component
 public class DBFiller implements CommandLineRunner {
 
@@ -21,7 +24,7 @@ public class DBFiller implements CommandLineRunner {
         
         repository
             .deleteAll()
-            .block(Duration.ofSeconds(2));
+            .block(Duration.ofSeconds(2)); // wait after completion with a timeout of 2 seconds
         
         Flux<HousePrice> housePrices = 
                 Flux.just(
@@ -31,7 +34,7 @@ public class DBFiller implements CommandLineRunner {
         
         repository
             .insert(housePrices)
-            .blockLast();
+            .blockLast(); // the method 'run' is blocking so we wait for completion
     }
 
 }
